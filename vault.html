@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunter's Vault</title>
+	<link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQG7art5X1WDPlc_d1Wy4D_UmK8L6ijioELiQ&s">
+    <link rel="stylesheet" href="styles.css">
+	
+	<style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        #hiddenContent {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+        }
+    </style>
+	
+</head>
+<body>
+
+<div class="container">
+    <h1>Password Protected Area</h1>
+	<p>Hello Jocey, welcome to my vault. It's locked tight so no getting in without the password (that only I know of course). You're welcome to chill here on this page though. :)</p>
+	<p>It's not a big deal, not like I keep all my most sensitive and salacious documents in here or anything...</p>
+    <input type="password" id="passwordInput" placeholder="Enter password" />
+    <button onclick="checkPassword()">Submit</button>
+    <div id="hiddenContent">
+        <h2>Better luck next time...</h2>
+        <p>This was alll a ruse to waste your time and to take up space in your head.</p>
+		<p>Hope you had fun though!<p>
+    </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
