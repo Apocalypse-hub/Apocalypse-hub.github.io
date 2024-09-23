@@ -1,20 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-    <style>
-        #hiddenContent {
-            display: none;
-        }
-    </style>
-    </head>
+<head>
+    <link rel="stylesheet" href="jocelyn-style.css" />
+</head>
 <body>
     <h3>
         Hey baby, seems like there's nothing to see here. I love you but I can't let you have such easy access to my mind all the time.
     </h3>
+    <input type="password" id="passwordInput" placeholder="Enter password" />
+    <button onclick="checkPassword()">Submit</button>
+    
     <div id="hiddenContent">
-    <p>
-        Hidden Content
-    </p>
+        <h1>
+            List of Things I Wanna Do With You
+        </h1>
+        <ul>
+            <li>Slow dance in the dark</li>
+            <li>Give each other hickeys</li>
+            <li>Go shopping together</li>
+            <li>Make food together</li>
+            <li>Kiss you while on top of you</li>
+            <li>Kiss your titties</li>
+            <li>Kiss your legs</li>
+            <li>Make out for a few hours consecutively</li>
+            <li>Kiss while pinning you against a wall</li>
+            <li>Play strip games</li>
+            <li>Masturbate with you</li>
+            <li>Watch porn together</li>
+            <li>Massage your WHOLE body</li>
+            <li>Grind on you fully dressed</li>
+            <li>Take each other's clothes off</li>
+            <li>Shower together</li>
+            <li>Grab your ass</li>
+            <li>Smack your ass</li>
+            <li>Grab your tits</li>
+            <li>Finger your pussy</li>
+            <li>Make each other cum</li>
+            <li>Have phone sex</li>
+            <li>Have video chat sex</li>
+            <li>Eat your pussy</li>
+            <li>Cum in your mouth</li>
+            <li>Make you cum in my mouth</li>
+            <li>Spend the night together</li>
+            <li>Drink together</li>
+            <li>Play drinking games together</li>
+            <li>Do drugs together (optional)</li>
+            <li>Skinny dip together</li>
+            <li>Fuck</li>
+            <li>Fuck in missionary</li>
+            <li>Fuck you from behind</li>
+            <li>Fuck your mouth</li>
+            <li>Make you gag and choke on my cock</li>
+            <li>Fuck while drunk</li>
+            <li>Fuck with you on top</li>
+            <li>Fuck all night</li>
+            <li>Fuck in a car</li>
+            <li>Fuck outside</li>
+            <li>Take pictures while fucking</li>
+            <li>Sixty-nine</li>
+            <li>Tie each other up</li>
+            <li>Choke you while I fuck you</li>
+            <li>Blindfold you while I fuck you</li>
+            <li>Fuck me until you beg me to stop (I won't)</li>
+            <li>Cum on your body</li>
+            <li>Cum inside you</li>
+            <li>Lick my cum off of you</li>
+            <li>Drink my cum out of you</li>
+        </ul>
     </div>
+
+    <script>
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const hiddenContent = document.getElementById('hiddenContent');
+
+            // Simple password check (adjust as needed)
+            if (password === 'secret') {
+                hiddenContent.classList.add('show');
+            } else {
+                alert('Wrong password! Try again.');
+            }
+        }
+    </script>
 </body>
 </html>

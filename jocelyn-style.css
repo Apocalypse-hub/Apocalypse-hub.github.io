@@ -1,0 +1,69 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #fce4ec; /* Soft pink background */
+    color: #333; /* Text color */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+}
+
+h1, h3 {
+    color: #ad1457; /* Deep pink for headings */
+}
+
+input[type="password"] {
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #ad1457;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #ad1457;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #e91e63; /* Lighter pink on hover */
+}
+
+ul {
+    list-style-type: none; /* Remove bullets */
+    padding: 0;
+}
+
+ul li {
+    background-color: #f8bbd0; /* Light pink background for list items */
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#hiddenContent {
+    display: none;
+    margin-top: 20px;
+}
+
+#hiddenContent.show {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out; /* Smooth fade-in effect */
+}
+
+/* Keyframes for fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
