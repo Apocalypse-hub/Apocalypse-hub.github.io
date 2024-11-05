@@ -34,7 +34,9 @@ Chernobyl, HBO miniseries
 Chapter 3<br>
 Chapter 4<br>
 Chapter 5</p>
+<div style="margin: auto;width:50%;">
 <h1 id="time-before-the-end">TIME BEFORE THE END</h1>
+</div>
 <div id="countdown">Loading...</div>
 <script>
     // Set the target date and time
@@ -53,12 +55,12 @@ Chapter 5</p>
 
       // Display the result in the element with id="countdown"
       document.getElementById("countdown").innerHTML = 
-        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        `${days}days ${hours}hours ${minutes}minutes ${seconds}seconds`;
 
       // If the countdown is over, display a message and stop the timer
       if (timeRemaining < 0) {
         clearInterval(countdownInterval);
-        document.getElementById("countdown").innerHTML = "Time's up!";
+        document.getElementById("countdown").innerHTML = "It's Over";
       }
     }, 1000);
   </script>
