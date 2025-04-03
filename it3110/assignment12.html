@@ -1,0 +1,166 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>assignment12</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#secure-disk-partitioning-and-file-system-configuration">Secure Disk Partitioning and File System Configuration</a>
+<ul>
+<li><a href="#infrastructure-details">Infrastructure Details</a></li>
+<li><a href="#partitioning-and-file-system-configuration">Partitioning and File System Configuration</a></li>
+<li><a href="#testing-and-validation">Testing and Validation</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#the-playbook">The Playbook</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="secure-disk-partitioning-and-file-system-configuration">Secure Disk Partitioning and File System Configuration</h1>
+<p>Use the Table of Contents to the side to jump around as needed!</p>
+<h2 id="infrastructure-details">Infrastructure Details</h2>
+<ul>
+<li><strong>Server OS</strong>: Ubuntu Linux</li>
+<li><strong>Additional Storage</strong>: 5GB disk (<code>/dev/sdb</code>)</li>
+<li><strong>Partitions and Mount Points</strong>:
+<ul>
+<li><code>/var/log/audit</code>: 1GB for audit logs</li>
+<li><code>/sysadmin</code>: 200MB for system administrator files</li>
+<li><code>/executives</code>: 500MB for executive use</li>
+<li><code>/analysts</code>: 200MB for analyst use (with restricted mount options)</li>
+</ul>
+</li>
+<li><strong>File System</strong>: <code>ext4</code> for all partitions</li>
+</ul>
+<h2 id="partitioning-and-file-system-configuration">Partitioning and File System Configuration</h2>
+<p>The Ansible playbook:</p>
+<ol>
+<li>Installs <code>parted</code> if required.</li>
+<li>Creates partitions using the <code>parted</code> module.</li>
+<li>Formats each partition with <code>ext4</code>.</li>
+<li>Creates the necessary mount points.</li>
+<li>Mounts partitions with specified options.</li>
+</ol>
+<h3 id="security-considerations">Security Considerations</h3>
+<ul>
+<li>The <code>/analysts</code> partition is mounted with <code>noexec, nosuid, nodev</code> to prevent execution of binaries and enhance security.</li>
+<li>The <code>/var/log/audit</code> partition ensures audit logs are securely stored and isolated.</li>
+<li>Other partitions provide separation of concerns, reducing the risk of data corruption or security breaches.</li>
+</ul>
+<h2 id="testing-and-validation">Testing and Validation</h2>
+<h3 id="test-cases">Test Cases</h3>
+<ol>
+<li><strong>Partition Verification</strong>:<pre class=" language-sh"><code class="prism  language-sh">lsblk
+</code></pre>
+Expected: The new partitions should appear with correct sizes.</li>
+<li><strong>Security Options Check</strong>:<pre class=" language-sh"><code class="prism  language-sh">mount | grep /analysts
+</code></pre>
+Expected: <code>/analysts</code> should have <code>noexec, nosuid, nodev</code> options applied.</li>
+</ol>
+<h2 id="results">Results</h2>
+<p>The following shows the successful tests and run of the playbook.</p>
+<h3 id="verified-partitions">Verified Partitions</h3>
+<img src="lsblk.PNG" alt="lsblk">
+<p>Everything in it’s right place.</p>
+<h3 id="security-options-applied">Security Options Applied</h3>
+<img src="options.PNG" alt="options">
+<p>Looks secure to me.</p>
+<h3 id="successful-playbook-run">Successful Playbook Run</h3>
+<img src="run-log.PNG" alt="successful-run" 
+     onclick="window.open('./run-log.png', '_blank');" 
+     style="cursor: pointer;">
+<p>If it's hard to see you can click the image to open it in a new tab.<br><br>This took a good bit of time, mostly to get my terraform to deploy a working and internet accessible EC2 instance.</p>
+<h2 id="the-playbook">The Playbook</h2>
+<pre class=" language-yaml"><code class="prism  language-yaml"><span class="token punctuation">---</span>
+<span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Secure Disk Partitioning and File System Configuration
+  <span class="token key atrule">hosts</span><span class="token punctuation">:</span> all
+  <span class="token key atrule">remote_user</span><span class="token punctuation">:</span> ubuntu
+  <span class="token key atrule">become</span><span class="token punctuation">:</span> yes
+  <span class="token key atrule">vars</span><span class="token punctuation">:</span>
+    <span class="token key atrule">disk_device</span><span class="token punctuation">:</span> <span class="token string">"/dev/xvdf"</span>
+    <span class="token key atrule">partitions</span><span class="token punctuation">:</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> audit_logs
+        <span class="token key atrule">mount_point</span><span class="token punctuation">:</span> <span class="token string">"/var/log/audit"</span>
+        <span class="token key atrule">size</span><span class="token punctuation">:</span> <span class="token string">"1GiB"</span>
+        <span class="token key atrule">number</span><span class="token punctuation">:</span> <span class="token number">1</span>
+        <span class="token key atrule">start</span><span class="token punctuation">:</span> <span class="token string">"0%"</span>
+        <span class="token key atrule">end</span><span class="token punctuation">:</span> <span class="token string">"1GiB"</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> sysadmin
+        <span class="token key atrule">mount_point</span><span class="token punctuation">:</span> <span class="token string">"/sysadmin"</span>
+        <span class="token key atrule">size</span><span class="token punctuation">:</span> <span class="token string">"200MiB"</span>
+        <span class="token key atrule">number</span><span class="token punctuation">:</span> <span class="token number">2</span>
+        <span class="token key atrule">start</span><span class="token punctuation">:</span> <span class="token string">"1GiB"</span>
+        <span class="token key atrule">end</span><span class="token punctuation">:</span> <span class="token string">"1.2GiB"</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> executives
+        <span class="token key atrule">mount_point</span><span class="token punctuation">:</span> <span class="token string">"/executives"</span>
+        <span class="token key atrule">size</span><span class="token punctuation">:</span> <span class="token string">"500MiB"</span>
+        <span class="token key atrule">number</span><span class="token punctuation">:</span> <span class="token number">3</span>
+        <span class="token key atrule">start</span><span class="token punctuation">:</span> <span class="token string">"1.2GiB"</span>
+        <span class="token key atrule">end</span><span class="token punctuation">:</span> <span class="token string">"1.7GiB"</span>
+      <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> analysts
+        <span class="token key atrule">mount_point</span><span class="token punctuation">:</span> <span class="token string">"/analysts"</span>
+        <span class="token key atrule">size</span><span class="token punctuation">:</span> <span class="token string">"200MiB"</span>
+        <span class="token key atrule">options</span><span class="token punctuation">:</span> <span class="token string">"noexec,nosuid,nodev"</span>
+        <span class="token key atrule">number</span><span class="token punctuation">:</span> <span class="token number">4</span>
+        <span class="token key atrule">start</span><span class="token punctuation">:</span> <span class="token string">"1.7GiB"</span>
+        <span class="token key atrule">end</span><span class="token punctuation">:</span> <span class="token string">"1.9GiB"</span>
+  <span class="token key atrule">tasks</span><span class="token punctuation">:</span>
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Install required packages
+      <span class="token key atrule">apt</span><span class="token punctuation">:</span>
+        <span class="token key atrule">name</span><span class="token punctuation">:</span> parted
+        <span class="token key atrule">state</span><span class="token punctuation">:</span> present
+
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Create partitions
+      <span class="token key atrule">parted</span><span class="token punctuation">:</span>
+        <span class="token key atrule">device</span><span class="token punctuation">:</span> <span class="token string">"{{ disk_device }}"</span>
+        <span class="token key atrule">number</span><span class="token punctuation">:</span> <span class="token string">"{{ item.number }}"</span>
+        <span class="token key atrule">state</span><span class="token punctuation">:</span> present
+        <span class="token key atrule">fs_type</span><span class="token punctuation">:</span> ext4
+        <span class="token key atrule">part_start</span><span class="token punctuation">:</span> <span class="token string">"{{ item.start }}"</span>
+        <span class="token key atrule">part_end</span><span class="token punctuation">:</span> <span class="token string">"{{ item.end }}"</span>
+      <span class="token key atrule">loop</span><span class="token punctuation">:</span> <span class="token string">"{{ partitions }}"</span>
+
+
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Format partitions with ext4
+      <span class="token key atrule">filesystem</span><span class="token punctuation">:</span>
+        <span class="token key atrule">fstype</span><span class="token punctuation">:</span> ext4
+        <span class="token key atrule">dev</span><span class="token punctuation">:</span> <span class="token string">"{{ disk_device }}{{ item.number }}"</span>
+      <span class="token key atrule">loop</span><span class="token punctuation">:</span> <span class="token string">"{{ partitions }}"</span>
+
+
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Create mount points
+      <span class="token key atrule">file</span><span class="token punctuation">:</span>
+        <span class="token key atrule">path</span><span class="token punctuation">:</span> <span class="token string">"{{ item.mount_point }}"</span>
+        <span class="token key atrule">state</span><span class="token punctuation">:</span> directory
+        <span class="token key atrule">owner</span><span class="token punctuation">:</span> root
+        <span class="token key atrule">group</span><span class="token punctuation">:</span> root
+        <span class="token key atrule">mode</span><span class="token punctuation">:</span> <span class="token string">"0755"</span>
+      <span class="token key atrule">loop</span><span class="token punctuation">:</span> <span class="token string">"{{ partitions }}"</span>
+
+    <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> Mount partitions
+      <span class="token key atrule">mount</span><span class="token punctuation">:</span>
+        <span class="token key atrule">path</span><span class="token punctuation">:</span> <span class="token string">"{{ item.mount_point }}"</span>
+        <span class="token key atrule">src</span><span class="token punctuation">:</span> <span class="token string">"{{ disk_device }}{{ item.number }}"</span>
+        <span class="token key atrule">fstype</span><span class="token punctuation">:</span> ext4
+        <span class="token key atrule">opts</span><span class="token punctuation">:</span> <span class="token string">"{{ item.options | default('defaults') }}"</span>
+        <span class="token key atrule">state</span><span class="token punctuation">:</span> mounted
+      <span class="token key atrule">loop</span><span class="token punctuation">:</span> <span class="token string">"{{ partitions }}"</span>
+</code></pre>
+
+    </div>
+  </div>
+</body>
+
+</html>
