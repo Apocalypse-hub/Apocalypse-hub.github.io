@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>final-writeup</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li>
+<ul>
+<li><a href="#penetration-test-report">Penetration Test Report</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h2 id="penetration-test-report">Penetration Test Report</h2>
+<p><strong>Client:</strong> E‑Corp<br>
+<strong>Target:</strong> Internal file‑sharing servers &amp; web applications<br>
+<strong>Tester:</strong> Hunter Gonzales (<a href="mailto:huntertgonzales@gmail.com">huntertgonzales@gmail.com</a>)</p>
+<hr>
+<h3 id="engagement-contacts">1. Engagement Contacts</h3>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Role</th>
+<th>Email</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hunter Mangus</td>
+<td>Penetration Tester</td>
+<td><a href="mailto:hunter.mangus@utahtech.edu">hunter.mangus@utahtech.edu</a></td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="executive-summary">2. Executive Summary</h3>
+<p>E‑Corp commissioned a black‑box penetration test of its internal file‑sharing infrastructure and associated servers. Over the engagement, critical flaws were discovered—most notably an unrestricted file‑upload endpoint permitting remote code execution (RCE), a misconfigured SUID binary enabling root escalation, and an anonymous‑login FTP server exposing sensitive employee data. The tester exploited these weaknesses to gain a reverse shell, escalate to root privileges, and download confidential spreadsheets. Immediate remediation is strongly advised to prevent full system compromise and protect corporate data.</p>
+<hr>
+<h3 id="in‑scope-assets">3. In‑Scope Assets</h3>
+
+<table>
+<thead>
+<tr>
+<th>Host / IP</th>
+<th>Service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>192.168.1.73:80</td>
+<td>Apache 2.4 + PHP web application</td>
+</tr>
+<tr>
+<td>192.168.1.73:21</td>
+<td>FTP file server (anonymous login enabled)</td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="methodology--findings-summary">4. Methodology &amp; Findings Summary</h3>
+<ul>
+<li>
+<p><strong>Reconnaissance:</strong> Nmap revealed open ports 21 (FTP), 22 (SSH), 80 (HTTP).</p>
+</li>
+<li>
+<p><strong>FTP Access:</strong> Anonymous login; retrieved <code>E‑Corp_employees.xlsx</code> containing SSNs, phone numbers, access levels, and hashed passwords.</p>
+</li>
+<li>
+<p><strong>Web Upload Exploration:</strong> Discovered <code>/upload.php</code> via directory brute‑forcing. Confirmed that arbitrary files could be uploaded and executed.</p>
+</li>
+<li>
+<p><strong>RCE Attack:</strong> Uploaded a PHP reverse‑shell to <code>/uploads/</code>; triggered it to obtain a shell on the target.</p>
+</li>
+<li>
+<p><strong>Privilege Escalation:</strong> Located and executed the SUID binary <code>/usr/local/bin/rootme</code>, escalating to root.</p>
+</li>
+<li>
+<p><strong>Data Exfiltration:</strong> Downloaded confidential employee data via FTP and HTTP.</p>
+</li>
+</ul>
+
+<table>
+<thead>
+<tr>
+<th>Severity</th>
+<th>Vulnerabilities Identified</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Critical</td>
+<td>1 (RCE via file upload)</td>
+</tr>
+<tr>
+<td>High</td>
+<td>2 (SUID misuse; FTP disclosure)</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>1 (Unrestricted file access)</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>4</strong></td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="detailed-technical-findings">5. Detailed Technical Findings</h3>
+<h4 id="remote-code-execution-critical">5.1 Remote Code Execution (Critical)</h4>
+<ul>
+<li>
+<p><strong>CWE‑434</strong>; CVSS 9.8</p>
+</li>
+<li>
+<p><strong>Issue:</strong> <code>upload.php</code> does not validate file types or sanitize input, allowing execution of uploaded PHP scripts.</p>
+</li>
+<li>
+<p><strong>Exploit:</strong> Reverse‑shell PHP uploaded and triggered, yielding system shell access.</p>
+</li>
+<li>
+<p><strong>Remediation:</strong></p>
+<ul>
+<li>
+<p>Enforce strict file‑type checks.</p>
+</li>
+<li>
+<p>Store uploads outside webroot.</p>
+</li>
+<li>
+<p>Disable script execution in upload directories (e.g., via <code>.htaccess</code>).</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="suid-binary-privilege-escalation-high">5.2 SUID Binary Privilege Escalation (High)</h4>
+<ul>
+<li>
+<p><strong>CWE‑250</strong>; CVSS 8.4</p>
+</li>
+<li>
+<p><strong>Issue:</strong> The binary <code>/usr/local/bin/rootme</code> is SUID and permits arbitrary root‑level command execution.</p>
+</li>
+<li>
+<p><strong>Exploit:</strong> Running <code>rootme</code> granted immediate root shell.</p>
+</li>
+<li>
+<p><strong>Remediation:</strong></p>
+<ul>
+<li>
+<p>Audit and remove unnecessary SUID bits.</p>
+</li>
+<li>
+<p>Adopt least‑privilege principles.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="sensitive-data-disclosure-via-ftp-high">5.3 Sensitive Data Disclosure via FTP (High)</h4>
+<ul>
+<li>
+<p><strong>CWE‑200</strong>; CVSS 8.1</p>
+</li>
+<li>
+<p><strong>Issue:</strong> Anonymous FTP access exposes confidential files.</p>
+</li>
+<li>
+<p><strong>Exploit:</strong> Downloaded <code>E‑Corp_employees.xlsx</code> containing PII and password hashes.</p>
+</li>
+<li>
+<p><strong>Remediation:</strong></p>
+<ul>
+<li>
+<p>Disable anonymous FTP.</p>
+</li>
+<li>
+<p>Require authentication and use secure protocols (e.g., SFTP).</p>
+</li>
+<li>
+<p>Apply proper file permissions.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="unrestricted-file-access-medium">5.4 Unrestricted File Access (Medium)</h4>
+<ul>
+<li>
+<p><strong>CWE‑732</strong>; CVSS 6.4</p>
+</li>
+<li>
+<p><strong>Issue:</strong> Uploaded files in <code>/uploads/</code> are publicly accessible without restrictions.</p>
+</li>
+<li>
+<p><strong>Exploit:</strong> Accessed uploaded reverse‑shell script via HTTP.</p>
+</li>
+<li>
+<p><strong>Remediation:</strong></p>
+<ul>
+<li>
+<p>Restrict directory listing and access via ACLs.</p>
+</li>
+<li>
+<p>Implement authentication/authorization controls.</p>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="conclusions--recommendations">6. Conclusions &amp; Recommendations</h3>
+<p>This assessment exposed fundamental security gaps in E‑Corp’s internal infrastructure that allow an attacker to:</p>
+<ol>
+<li>
+<p>Upload and execute malicious code.</p>
+</li>
+<li>
+<p>Escalate privileges to root via a misconfigured SUID binary.</p>
+</li>
+<li>
+<p>Download sensitive employee data through anonymous FTP.</p>
+</li>
+</ol>
+<p><strong>Key Recommendations:</strong></p>
+<ul>
+<li>
+<p><strong>Harden File‑Upload Handling:</strong> Validate and sanitize all uploads; store outside webroot; disable execution.</p>
+</li>
+<li>
+<p><strong>Enforce Least Privilege:</strong> Remove unnecessary SUID binaries; apply strict file permissions.</p>
+</li>
+<li>
+<p><strong>Secure File Transfers:</strong> Disable anonymous FTP; transition to authenticated SFTP/FTPS.</p>
+</li>
+<li>
+<p><strong>Implement Monitoring:</strong> Deploy SIEM for centralized logging and alerting on suspicious activity.</p>
+</li>
+<li>
+<p><strong>Regular Assessments:</strong> Schedule periodic pentests and configuration reviews to catch regressions.</p>
+</li>
+</ul>
+<p>By addressing these issues, E‑Corp can significantly strengthen its security posture and safeguard its sensitive data.</p>
+
+    </div>
+  </div>
+</body>
+
+</html>
